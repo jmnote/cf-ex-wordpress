@@ -13,28 +13,25 @@
  *
  * @package WordPress
  */
-
-// ** Read MySQL service properties from _ENV['VCAP_SERVICES']
-$services = json_decode($_ENV['VCAP_SERVICES'], true);
-$service = $services['cleardb'][0];  // pick the first MySQL service
+ 
+// pick the first MySQL service
+function pick_mysql_service() {
+	$services = json_decode($_ENV['VCAP_SERVICES'], true);	
+	foreach($services as $service_provider => $service) {
+		if( $service_provider == 'devpack-db' ) return $service[0];
+		if( $service_provider == 'cleardb' ) return $service[0];
+		if( $service_provider == 'p-mysql' ) return $service[0];
+	}
+	return false;
+}
+$service = pick_mysql_service();
 
 // ** MySQL settings - You can get this info from your web host ** //
-/** The name of the database for WordPress */
 define('DB_NAME', $service['credentials']['name']);
-
-/** MySQL database username */
 define('DB_USER', $service['credentials']['username']);
-
-/** MySQL database password */
 define('DB_PASSWORD', $service['credentials']['password']);
-
-/** MySQL hostname */
 define('DB_HOST', $service['credentials']['hostname'] . ':' . $service['credentials']['port']);
-
-/** Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
-
-/** The Database Collate type. Don't change this if in doubt. */
 define('DB_COLLATE', '');
 
 /**#@+
